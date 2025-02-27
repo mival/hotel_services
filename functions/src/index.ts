@@ -33,7 +33,7 @@ exports.serviceFilter = onRequest(
       process.env.SUPABASE_KEY || ""
     );
 
-    let query = supabase
+    const query = supabase
       .from("hotels")
       .select(
         "hotel_id, hotels_services!inner(hotel_id, service_id, services!inner(name))"
@@ -48,23 +48,23 @@ exports.serviceFilter = onRequest(
     }
 
     const hotelData = data
-      .map((hotel: any) => {
+      .map((hotel) => {
         return {
           hotel_id: hotel.hotel_id,
           services: hotel.hotels_services.map(
-            (service: any) => service.services.name
+            (service) => service.services.name
           ),
         };
       })
-      .filter((hotel: any) => {
+      .filter((hotel) => {
         return (services as string[]).every((service: string) =>
           hotel.services.includes(service)
         );
       });
 
-    const unique = [...new Set(hotelData.map((hotel: any) => hotel.hotel_id))];
+    const unique = [...new Set(hotelData.map((hotel) => hotel.hotel_id))];
 
-    response.send(unique.map((hotelId: any) => ({ hotel_id: hotelId })));
+    response.send(unique.map((hotelId) => ({ hotel_id: hotelId })));
   }
 );
 
@@ -105,12 +105,12 @@ exports.hotelChanges = onDocumentWritten(
       await supabase.from("hotels_services").delete().match({ hotel_id: id });
 
       await Promise.all(
-        document.services.map((service: any) => {
+        document.services.map((service) => {
           supabase
             .from("services")
             .select("id")
             .eq("name", service)
-            .then((existingService: any) => {
+            .then((existingService) => {
               if (existingService.data?.length) {
                 const existingServiceId = existingService.data[0].id;
                 return supabase.from("hotels_services").upsert([
@@ -125,7 +125,7 @@ exports.hotelChanges = onDocumentWritten(
                   .from("services")
                   .insert([{ name: service }])
                   .select("id")
-                  .then((response: any) => {
+                  .then((response) => {
                     if (!response.data) {
                       return;
                     }
