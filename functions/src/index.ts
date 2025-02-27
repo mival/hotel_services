@@ -105,7 +105,7 @@ exports.hotelChanges = onDocumentWritten(
       await supabase.from("hotels_services").delete().match({ hotel_id: id });
 
       await Promise.all(
-        document.services.map((service) => {
+        document.services.map((service: string) => {
           supabase
             .from("services")
             .select("id")
